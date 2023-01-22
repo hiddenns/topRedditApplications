@@ -5,11 +5,15 @@ import java.io.Serializable;
 public class Publication implements Serializable {
     private String id;
     private String title;
-    private String ups;
+    private String author;
+    private int ups;
     private String description;
-    private String num_comments;
-    private String created_utc;
-    private Thumbnail thumbnail;
+    private int num_comments;
+    private double created_utc;
+    private String thumbnail;
+    private String url;
+    private Media media;
+    private boolean isVideo;
 
     public String getId() {
         return id;
@@ -27,11 +31,11 @@ public class Publication implements Serializable {
         this.title = title;
     }
 
-    public String getUps() {
+    public int getUps() {
         return ups;
     }
 
-    public void setUps(String ups) {
+    public void setUps(int ups) {
         this.ups = ups;
     }
 
@@ -43,27 +47,59 @@ public class Publication implements Serializable {
         this.description = description;
     }
 
-    public String getNum_comments() {
+    public int getNum_comments() {
         return num_comments;
     }
 
-    public void setNum_comments(String num_comments) {
+    public void setNum_comments(int num_comments) {
         this.num_comments = num_comments;
     }
 
-    public String getCreated_utc() {
+    public double getCreated_utc() {
         return created_utc;
     }
 
-    public void setCreated_utc(String created_utc) {
+    public void setCreated_utc(double created_utc) {
         this.created_utc = created_utc;
     }
 
-    public Thumbnail getThumbnail() {
+    public String getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(Thumbnail thumbnail) {
+    public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public Media getMedia() {
+        return media;
+    }
+
+    public void setMedia(Media media) {
+        this.media = media;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public boolean isVideo() {
+        return isVideo;
+    }
+
+    public void setVideo(boolean video) {
+        isVideo = video;
     }
 }

@@ -106,7 +106,7 @@ public class Data{
     public Object discussion_type;
     public int num_comments;
     public boolean send_replies;
-    public Object media;
+    public Media media;
     public boolean contest_mode;
     public boolean author_patreon_flair;
     public String author_flair_text_color;
@@ -135,4 +135,6 @@ public class Data{
     public int controversiality;
     public int depth;
     public Object collapsed_because_crowd_control;
+
+
 }
