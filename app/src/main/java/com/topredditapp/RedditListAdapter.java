@@ -75,5 +75,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
             this.textView = (TextView) itemView.findViewById(R.id.textView);
             relativeLayout = (RelativeLayout)itemView.findViewById(R.id.relativeLayout);
         }
+
+
     }
 }
