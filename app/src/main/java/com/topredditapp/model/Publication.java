@@ -15,6 +15,22 @@ public class Publication implements Serializable {
     private Media media;
     private boolean isVideo;
 
+    public Publication() {
+    }
+    public Publication(String id, String title, String author, int ups, String description, int num_comments, double created_utc, String thumbnail, String url, Media media, boolean isVideo) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.ups = ups;
+        this.description = description;
+        this.num_comments = num_comments;
+        this.created_utc = created_utc;
+        this.thumbnail = thumbnail;
+        this.url = url;
+        this.media = media;
+        this.isVideo = isVideo;
+    }
+
     public String getId() {
         return id;
     }

@@ -1,10 +1,11 @@
-package com.topredditapp;
+package com.topredditapp.controller;
 
 import android.app.Application;
 import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.topredditapp.RedditAPI;
 import com.topredditapp.model.Child;
 import com.topredditapp.model.Data;
 import com.topredditapp.model.Media;
@@ -24,7 +25,7 @@ public class Controller implements Callback<Root> {
     String BASE_URL = "https://www.reddit.com/top.json/";
 
     public Root root;
-    ArrayList<Publication> publications = new ArrayList<>();
+    private ArrayList<Publication> publications = new ArrayList<>();
 
     public void start() {
         Gson gson = new GsonBuilder()
@@ -75,4 +76,7 @@ public class Controller implements Callback<Root> {
         System.out.println("FAILURE");
     }
 
+    public ArrayList<Publication> getPublications() {
+        return publications;
+    }
 }
