@@ -14,21 +14,25 @@ public class Publication implements Serializable {
     private String url;
     private Media media;
     private boolean isVideo;
+    private ContentType contentType;
 
-    public Publication() {
+    public Publication() {}
+
+    private void defineContentType() {
+        if (isVideo) {
+            this.contentType = ContentType.Video;
+        } else {
+            this.contentType = ContentType.Photo;
+        }
     }
-    public Publication(String id, String title, String author, int ups, String description, int num_comments, double created_utc, String thumbnail, String url, Media media, boolean isVideo) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.ups = ups;
-        this.description = description;
-        this.num_comments = num_comments;
-        this.created_utc = created_utc;
-        this.thumbnail = thumbnail;
-        this.url = url;
-        this.media = media;
-        this.isVideo = isVideo;
+
+    public int getContentType() {
+        defineContentType();
+        return contentType.getIndexType();
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
     }
 
     public String getId() {

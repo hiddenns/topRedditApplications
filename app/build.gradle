@@ -35,6 +35,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    // https://mvnrepository.com/artifact/com.squareup.picasso/picasso
+    implementation group: 'com.squareup.picasso', name: 'picasso', version: '2.71828'
+
 
 
     implementation group: 'org.simpleframework', name: 'simple-xml', version: '2.7'

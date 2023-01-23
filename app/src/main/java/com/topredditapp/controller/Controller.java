@@ -1,19 +1,13 @@
 package com.topredditapp.controller;
 
-import android.app.Application;
-import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.topredditapp.RedditAPI;
 import com.topredditapp.RedditListAdapter;
 import com.topredditapp.model.Child;
-import com.topredditapp.model.Data;
-import com.topredditapp.model.Media;
 import com.topredditapp.model.Publication;
 import com.topredditapp.model.Root;
 
