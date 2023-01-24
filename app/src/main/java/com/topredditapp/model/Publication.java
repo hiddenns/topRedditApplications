@@ -9,7 +9,7 @@ public class Publication implements Serializable {
     private int ups;
     private String description;
     private int num_comments;
-    private double created_utc;
+    private double created;
     private String thumbnail;
     private String url;
     private Media media;
@@ -75,12 +75,12 @@ public class Publication implements Serializable {
         this.num_comments = num_comments;
     }
 
-    public double getCreated_utc() {
-        return created_utc;
+    public double getCreated() {
+        return created;
     }
 
-    public void setCreated_utc(double created_utc) {
-        this.created_utc = created_utc;
+    public void setCreated(double created) {
+        this.created = created;
     }
 
     public String getThumbnail() {

@@ -21,6 +21,9 @@ import com.topredditapp.model.Publication;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -63,11 +66,13 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
 
                 Picasso.get().load(data.getUrl()).into(holderImg.imageContent);
 
+                // calculate how many hours ago was posted a publication
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    long diff = (long) (data.getCreated_utc() - new Date().getTime());
-                    Date dateDiff = new Date(diff);
-                    holderImg.textCreatedAt.setText(dateDiff.getDay() + " hours ago");
+                    Instant createdAt = Instant.ofEpochSecond((long) data.getCreated());
+                    long hoursDiff = ChronoUnit.HOURS.between(createdAt, Instant.now());
+                    holderImg.textCreatedAt.setText(hoursDiff + " hours ago");
                 }
+
                // holderImg.textComments.setText(data.getNum_comments() + " comments");
                 holder = holderImg;
                 break;
@@ -78,9 +83,9 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
                 holderVideo.textUps.setText(String.valueOf(data.getUps()));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    long diff = (long) (data.getCreated_utc() - new Date().getTime());
-                    Date dateDiff = new Date(diff);
-                    holderVideo.textCreatedAt.setText(dateDiff.getDay() + " hours ago");
+                    Instant createdAt = Instant.ofEpochSecond((long) data.getCreated());
+                    long hoursDiff = ChronoUnit.HOURS.between(createdAt, Instant.now());
+                    holderVideo.textCreatedAt.setText(hoursDiff + " hours ago");
                 }
 
                 Uri uri = Uri.parse(data.getMedia().getReddit_video().fallback_url);

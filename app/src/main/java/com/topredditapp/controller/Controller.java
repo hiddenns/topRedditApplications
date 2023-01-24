@@ -55,7 +55,7 @@ public class Controller {
                     for (int i = 0; i < children.size(); i++) {
                         Publication publication = new Publication();
                         publication.setId(children.get(i).getData().id);
-                        publication.setCreated_utc(children.get(i).getData().created_utc);
+                        publication.setCreated(children.get(i).getData().created);
                         publication.setThumbnail(children.get(i).getData().thumbnail);
                         publication.setNum_comments(children.get(i).getData().num_comments);
                         publication.setTitle(children.get(i).getData().title);
