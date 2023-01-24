@@ -1,6 +1,7 @@
 package com.topredditapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +15,8 @@ import com.topredditapp.model.Publication;
 
 import java.io.IOException;
 
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
     private final Controller redditController = new Controller();
@@ -26,13 +29,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         init();
         fillRecyclerView();
 
         button.setOnClickListener(view -> {
             //Toast.makeText(MainActivity.this, controller.getPublications().get(0).getTitle(), Toast.LENGTH_LONG).show();
         });
-
 
         // fetch to RedditController recycleViewAdapter for notify them
         // when data is loaded
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private void fillRecyclerView() {
         rwAdapter = new RedditListAdapter(redditController.getPublications());
         recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(rwAdapter);
 

@@ -39,8 +39,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.squareup.picasso/picasso
     implementation group: 'com.squareup.picasso', name: 'picasso', version: '2.71828'
 
+    implementation 'com.jakewharton:butterknife:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
-
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation group: 'org.simpleframework', name: 'simple-xml', version: '2.7'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
