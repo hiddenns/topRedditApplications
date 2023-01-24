@@ -81,7 +81,7 @@ public class Data{
     public boolean pinned;
     public boolean over_18;
     public Preview preview;
-    public ArrayList<Object> all_awardings;
+    public ArrayList<AllAwardings> all_awardings;
     public ArrayList<Object> awarders;
     public boolean media_only;
     public boolean can_gild;

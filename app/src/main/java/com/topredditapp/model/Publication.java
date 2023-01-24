@@ -8,13 +8,14 @@ public class Publication implements Serializable {
     private String author;
     private int ups;
     private String description;
-    private int num_comments;
+    private int numComments;
     private double created;
     private String thumbnail;
     private String url;
     private Media media;
     private boolean isVideo;
     private ContentType contentType;
+    private String iconUrl;
 
     public Publication() {}
 
@@ -24,6 +25,14 @@ public class Publication implements Serializable {
         } else {
             this.contentType = ContentType.Photo;
         }
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     public int getContentType() {
@@ -67,12 +76,12 @@ public class Publication implements Serializable {
         this.description = description;
     }
 
-    public int getNum_comments() {
-        return num_comments;
+    public int getNumComments() {
+        return numComments;
     }
 
-    public void setNum_comments(int num_comments) {
-        this.num_comments = num_comments;
+    public void setNumComments(int numComments) {
+        this.numComments = numComments;
     }
 
     public double getCreated() {

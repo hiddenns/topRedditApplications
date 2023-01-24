@@ -1,5 +1,8 @@
 package com.topredditapp;
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -7,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -26,6 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.ViewHolder> {
     private List<Publication> publicationList;
@@ -60,59 +65,32 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         switch (holder.getItemViewType()) {
             case 0:
                 ViewHolderImg holderImg = (ViewHolderImg) holder;
-                holderImg.textAuthor.setText(data.getAuthor() + " p");
-                holderImg.textTitle.setText(data.getTitle());
-                holderImg.textUps.setText(String.valueOf(data.getUps()));
-
                 Picasso.get().load(data.getUrl()).into(holderImg.imageContent);
-
-                // calculate how many hours ago was posted a publication
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    Instant createdAt = Instant.ofEpochSecond((long) data.getCreated());
-                    long hoursDiff = ChronoUnit.HOURS.between(createdAt, Instant.now());
-                    holderImg.textCreatedAt.setText(hoursDiff + " hours ago");
-                }
-
-               // holderImg.textComments.setText(data.getNum_comments() + " comments");
                 holder = holderImg;
                 break;
             case 1:
                 ViewHolderVideo holderVideo = (ViewHolderVideo) holder;
-                holderVideo.textAuthor.setText(data.getAuthor() + " v");
-                holderVideo.textTitle.setText(data.getTitle());
-                holderVideo.textUps.setText(String.valueOf(data.getUps()));
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    Instant createdAt = Instant.ofEpochSecond((long) data.getCreated());
-                    long hoursDiff = ChronoUnit.HOURS.between(createdAt, Instant.now());
-                    holderVideo.textCreatedAt.setText(hoursDiff + " hours ago");
-                }
-
                 Uri uri = Uri.parse(data.getMedia().getReddit_video().fallback_url);
-                //holderVideo.textComments.setText(data.getNum_comments() + " comments");
                 holderVideo.videoContent.setVideoURI(uri);
                 holderVideo.videoContent.start();
-
                 holder = holderVideo;
                 break;
         }
 
-        //holder.textView.setText(publicationList.get(position).getTitle());
-
-        if (publicationList.get(position).isVideo() || publicationList.get(position).getMedia() == null) {
-            URL myUrl = null;
-            try {
-                myUrl = new URL(publicationList.get(position).getUrl());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            InputStream inputStream = null;
-
-            Drawable drawable = Drawable.createFromStream(inputStream, null);
-//            i.setImageDrawable(drawable);
-            //holder.imageView.setImageResource(drawable);
-            //holder.imageView.setImageDrawable(null);
+        // calculate how many hours ago a publication was posted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Instant createdAt = Instant.ofEpochSecond((long) data.getCreated());
+            long hoursDiff = ChronoUnit.HOURS.between(createdAt, Instant.now());
+            holder.textCreatedAt.setText(hoursDiff + " hours ago");
         }
+
+        holder.textComments.setText(data.getNumComments() + " comments");
+        holder.textAuthor.setText(data.getAuthor());
+        holder.textTitle.setText(data.getTitle());
+        holder.textUps.setText(((double) (data.getUps() / 100) / 10) + "k");
+        //Picasso.get().load(data.getIconUrl()).into(holder.imageProfile);
+
+
         holder.constraintLayout.setOnClickListener(view ->
                 Toast.makeText(view.getContext(), "click on item: " + data.getTitle(), Toast.LENGTH_LONG).show());
     }
@@ -145,12 +123,11 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
             this.textTitle = itemView.findViewById(R.id.titleText);
             this.textUps = itemView.findViewById(R.id.upsText);
             this.constraintLayout = itemView.findViewById(R.id.constraintContentLayout);
-            this.textComments = itemView.findViewById(R.id.commentsText);
+            this.textComments = itemView.findViewById(R.id.numCommentsText);
         }
     }
 
     public static class ViewHolderImg extends ViewHolder {
-
         private ImageView imageContent;
 
         public ViewHolderImg(View itemView) {

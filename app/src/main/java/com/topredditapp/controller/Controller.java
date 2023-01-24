@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.topredditapp.RedditAPI;
 import com.topredditapp.RedditListAdapter;
+import com.topredditapp.model.AllAwardings;
 import com.topredditapp.model.Child;
 import com.topredditapp.model.Publication;
 import com.topredditapp.model.Root;
@@ -57,13 +58,19 @@ public class Controller {
                         publication.setId(children.get(i).getData().id);
                         publication.setCreated(children.get(i).getData().created);
                         publication.setThumbnail(children.get(i).getData().thumbnail);
-                        publication.setNum_comments(children.get(i).getData().num_comments);
+                        publication.setNumComments(children.get(i).getData().num_comments);
                         publication.setTitle(children.get(i).getData().title);
                         publication.setUps(children.get(i).getData().ups);
                         publication.setAuthor(children.get(i).getData().author);
                         publication.setMedia(children.get(i).getData().media);
                         publication.setUrl(children.get(i).getData().url);
                         publication.setVideo(children.get(i).getData().is_video);
+
+                        ArrayList<AllAwardings> awardings = children.get(i).getData().all_awardings;
+
+//                        if (awardings.size() != 0) {
+//                            publication.setIconUrl(awardings.get(awardings.size()-1).static_icon_url);
+//                        }
                         publications.add(publication);
                     }
 
