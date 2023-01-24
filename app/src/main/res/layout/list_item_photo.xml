@@ -58,9 +58,9 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
+                    android:background="#269"
                     android:text="Title"
                     android:textSize="18sp"
-                    android:background="#269"
                     app:layout_constraintBottom_toBottomOf="@+id/upsText"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -79,11 +79,13 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintContentLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="200dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginEnd="8dp"
+
+                    android:background="#111"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/titleText">
@@ -92,17 +94,14 @@
                     <ImageView
                         android:id="@+id/imageContent"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_height="250dp"
                         android:layout_marginEnd="8dp"
-
-                        android:layout_gravity="center_horizontal"
-
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:maxHeight="300dp"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHeight_max="wrap"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintWidth_max="wrap"
                         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

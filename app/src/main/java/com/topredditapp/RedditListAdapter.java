@@ -88,8 +88,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         holder.textAuthor.setText(data.getAuthor());
         holder.textTitle.setText(data.getTitle());
         holder.textUps.setText(((double) (data.getUps() / 100) / 10) + "k");
-        //Picasso.get().load(data.getIconUrl()).into(holder.imageProfile);
-
 
         holder.constraintLayout.setOnClickListener(view ->
                 Toast.makeText(view.getContext(), "click on item: " + data.getTitle(), Toast.LENGTH_LONG).show());
