@@ -1,6 +1,7 @@
 package com.topredditapp.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Publication implements Serializable {
     private String id;
@@ -130,5 +131,19 @@ public class Publication implements Serializable {
 
     public void setVideo(boolean video) {
         isVideo = video;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Publication that = (Publication) o;
+        if (that.getId() == id) return true;
+        return ups == that.ups && numComments == that.numComments && Double.compare(that.created, created) == 0 && isVideo == that.isVideo && Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(author, that.author) && Objects.equals(description, that.description) && Objects.equals(thumbnail, that.thumbnail) && Objects.equals(url, that.url) && Objects.equals(media, that.media) && contentType == that.contentType && Objects.equals(iconUrl, that.iconUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

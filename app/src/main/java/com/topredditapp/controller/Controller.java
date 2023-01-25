@@ -1,13 +1,20 @@
 package com.topredditapp.controller;
 
 
+
+import static com.topredditapp.Const.BASE_URL;
+import static com.topredditapp.Const.PAGE_SIZE;
+
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.topredditapp.MainActivity;
 import com.topredditapp.RedditAPI;
 import com.topredditapp.RedditListAdapter;
-import com.topredditapp.model.AllAwardings;
 import com.topredditapp.model.Child;
 import com.topredditapp.model.Publication;
 import com.topredditapp.model.Root;
@@ -21,9 +28,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-//key vJre4waKAbNUge9ppLsNzw
 public class Controller {
-    private final String BASE_URL = "https://www.reddit.com/";
+    private final String TAG = "Controller";
+    private String afterDataId = null;
+    private int counterPages = 0;
 
     private ArrayList<Publication> publications = new ArrayList<>();
 
@@ -34,6 +42,7 @@ public class Controller {
     }
 
     public void start() throws IOException {
+        Log.d(TAG, "Start()");
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -44,12 +53,22 @@ public class Controller {
                 .build();
 
         RedditAPI redditAPI = retrofit.create(RedditAPI.class);
-        Call<Root> call = redditAPI.getFeed();
+        Call<Root> call;
 
-//        call.enqueue(this);
+        if (afterDataId == null) {
+            call = redditAPI.getTopContent(PAGE_SIZE);
+            Log.d(TAG, "call request DEFAULT");
+        } else {
+            Log.d(TAG, "call request AFTER id: " + afterDataId);
+            call = redditAPI.getTopContent(PAGE_SIZE, afterDataId);
+        }
+        Log.d(TAG, "call request done!");
+
         call.enqueue(new Callback<Root>() {
             @Override
             public void onResponse(@NonNull Call<Root> call, Response<Root> response) {
+                Log.d(TAG, "onResponse()");
+
                 if (response.isSuccessful() && response.body() != null) {
                     ArrayList<Child> children = response.body().getData().children;
 
@@ -66,9 +85,15 @@ public class Controller {
                         publication.setUrl(children.get(i).getData().url);
                         publication.setVideo(children.get(i).getData().is_video);
                         publications.add(publication);
+                        Log.d(TAG, "add publication title: " + publication.getTitle());
                     }
-
+                    Log.d(TAG, "add data ID: " + response.body().getData().after);
+                    afterDataId = response.body().getData().after;
                     recyclerView.notifyDataSetChanged();
+                    counterPages++;
+
+                    Log.d(TAG, "Counter pages: " + counterPages +
+                            "\n======== end request ==============");
                 } else {
                     System.out.println(response.errorBody());
                 }
@@ -76,15 +101,23 @@ public class Controller {
 
             @Override
             public void onFailure(Call<Root> call, Throwable t) {
-                System.out.println("FAILURE");
+                System.err.println(t.getMessage());
+                t.printStackTrace();
+                Log.d(TAG, "Failure request! " + t.getMessage());
             }
         });
-//        call.execute();
-//        Log.d("prog", "loading done...");
     }
 
     public ArrayList<Publication> getPublications() {
         return publications;
+    }
+
+    public void clearData() {
+        Log.d("Controller", "clear data");
+        afterDataId = null;
+        publications.clear();
+        counterPages = 0;
+        Log.d("Controller", "refresh");
     }
 
 }

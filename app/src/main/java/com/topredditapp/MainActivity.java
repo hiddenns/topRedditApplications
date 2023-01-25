@@ -1,5 +1,7 @@
 package com.topredditapp;
 
+
+import static com.topredditapp.Const.PAGE_SIZE;
 import static com.topredditapp.PaginationListener.PAGE_START;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,15 +13,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.topredditapp.controller.Controller;
 import com.topredditapp.model.Publication;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import butterknife.ButterKnife;
 
@@ -33,11 +35,9 @@ public class MainActivity extends AppCompatActivity
     private SwipeRefreshLayout swipeRefresh;
 
     private RecyclerView recyclerView;
-    private Button button;
 
     private int currentPage = PAGE_START;
     private boolean isLastPage = false;
-    private int totalPage = 10;
     private boolean isLoading = false;
     int itemCount = 0;
 
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
         init();
         fillRecyclerView();
-
         doRedditApiCall();
     }
 
@@ -60,30 +59,32 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        final ArrayList<Publication> items = redditController.getPublications();
         new Handler().postDelayed(() -> {
+            ArrayList<Publication> items;
+
+            // If there's a need to upload more data. Already existing data can be truncated
+            if (currentPage != 1 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                items = redditController.getPublications()
+                        .stream()
+                        .skip((long) (currentPage - 1) * PAGE_SIZE)
+                        .collect(Collectors.toCollection(ArrayList::new));
+            } else {
+                items = redditController.getPublications();
+            }
             /**
              * manage progress view
              */
-            Log.d("MainActivity:", "handler");
             if (currentPage != PAGE_START) rwAdapter.removeLoading();
-            Log.d("MainActivity:", "current page = " + currentPage);
             rwAdapter.addItems(items);
             swipeRefresh.setRefreshing(false);
-            // check weather is last page or not
-            if (currentPage < totalPage) {
-                rwAdapter.addLoading();
-            } else {
-                Log.d("MainActivity:", "isLastPage");
-                isLastPage = true;
-            }
+            rwAdapter.addLoading();
             isLoading = false;
         }, 1500);
-
+        Log.d(TAG, "doRedditApiCall finish");
     }
 
     private void init() {
-        button = findViewById(R.id.button_test);
+        //button = findViewById(R.id.button_test);
         recyclerView = findViewById(R.id.recyclerView);
         swipeRefresh = findViewById(R.id.swipeRefresh);
     }
@@ -108,10 +109,10 @@ public class MainActivity extends AppCompatActivity
          */
         recyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
-            protected void loadMoreItems() { // problem
+            protected void loadMoreItems() {
                 isLoading = true;
                 currentPage++;
-                Log.d("MainActivity:", "scroll current page: " + currentPage);
+                Log.d(TAG, "scroll current page: " + currentPage);
                 doRedditApiCall();
             }
 
@@ -134,7 +135,9 @@ public class MainActivity extends AppCompatActivity
         currentPage = PAGE_START;
         isLastPage = false;
         rwAdapter.clear();
+        redditController.clearData();
         doRedditApiCall();
+        Log.d(TAG, "refresh");
     }
 
 }

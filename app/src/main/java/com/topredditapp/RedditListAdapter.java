@@ -21,7 +21,9 @@ import com.topredditapp.model.Publication;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,7 +33,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
     private boolean isLoaderVisible = false;
 
     private static final int VIEW_TYPE_LOADING = 0;
-    private static final int VIEW_TYPE_NORMAL = 1;
 
     public RedditListAdapter(List<Publication> publicationList) {
         this.publicationList = publicationList;
@@ -41,11 +42,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        Log.d("adapter", "onCreate ViewHolder: " + viewType);
-//        if (viewType == VIEW_TYPE_LOADING) {
-//            return new ProgressHolder(
-//                    layoutInflater.inflate(R.layout.item_loading, parent, false));
-//        }
+//        Log.d("adapter", "onCreate ViewHolder: " + viewType);
 
         switch (viewType) {
             case 0:
@@ -89,7 +86,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         }
     }
 
-    public void addItems(List<Publication> publications) {
+    public void addItems(ArrayList<Publication> publications) {
         publicationList.addAll(publications);
         notifyDataSetChanged();
     }
@@ -183,7 +180,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         public ViewHolderImg(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-//            this.imageContent = itemView.findViewById(R.id.imageContent);
         }
 
         @Override
@@ -203,7 +199,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         public ViewHolderVideo(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-//            videoContent = itemView.findViewById(R.id.videoContent);
         }
 
         @Override
@@ -220,7 +215,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
 
         ProgressHolder(View itemView) {
             super(itemView);
-//            ButterKnife.bind(this, itemView);
         }
 
 

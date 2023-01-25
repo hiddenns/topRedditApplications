@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 @Root(name = "data", strict = false)
 public class Data{
-    public Object after;
+    public String after;
     public int dist;
     public String modhash;
     public String geo_filter;
@@ -54,7 +54,7 @@ public class Data{
     public boolean is_created_from_ads_ui;
     public boolean author_premium;
     public String thumbnail;
-    public boolean edited;
+//    public boolean edited;
     public Object author_flair_css_class;
     public ArrayList<Object> author_flair_richtext;
     public String post_hint;
