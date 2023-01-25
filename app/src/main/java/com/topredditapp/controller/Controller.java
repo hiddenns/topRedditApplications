@@ -65,12 +65,6 @@ public class Controller {
                         publication.setMedia(children.get(i).getData().media);
                         publication.setUrl(children.get(i).getData().url);
                         publication.setVideo(children.get(i).getData().is_video);
-
-                        ArrayList<AllAwardings> awardings = children.get(i).getData().all_awardings;
-
-//                        if (awardings.size() != 0) {
-//                            publication.setIconUrl(awardings.get(awardings.size()-1).static_icon_url);
-//                        }
                         publications.add(publication);
                     }
 

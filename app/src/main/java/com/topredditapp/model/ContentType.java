@@ -1,7 +1,7 @@
 package com.topredditapp.model;
 
 public enum ContentType {
-    Photo(0), Video(1), Gif(3);
+    Photo(1), Video(2);
 
     private int indexType;
 
