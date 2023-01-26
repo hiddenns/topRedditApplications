@@ -1,5 +1,6 @@
 package com.topredditapp;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -16,14 +18,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.topredditapp.model.ContentType;
 import com.topredditapp.model.Publication;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,7 +48,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
             case 0:
                 Log.d("adapter", "on progressBar holder vt:" + viewType);
                 return new ProgressHolder(
-                        layoutInflater.inflate(R.layout.item_loading, parent, false));
+                        layoutInflater.inflate(R.layout.item_loading_recycler_view, parent, false));
             case 1:
                 Log.d("adapter", "on img holder vt:" + viewType);
                 View viewItemPhoto = layoutInflater.inflate(R.layout.list_item_photo, parent, false);
@@ -166,11 +166,9 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
                 //clear();
             }
         }
-
         public int getCurrentPosition() {
             return mCurrentPosition;
         }
-
     }
 
     public class ViewHolderImg extends ViewHolder {
@@ -188,13 +186,14 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
             Publication data = publicationList.get(position);
             Picasso.get().load(data.getUrl()).into(imageContent);
         }
-
-
     }
 
     public class ViewHolderVideo extends ViewHolder {
         @BindView(R.id.videoContent)
         VideoView videoContent;
+
+        @BindView(R.id.progressBarVideo)
+        ProgressBar progressBar;
 
         public ViewHolderVideo(View itemView) {
             super(itemView);
@@ -204,11 +203,22 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         @Override
         public void onBind(int position) {
             super.onBind(position);
+
+            progressBar.setVisibility(View.VISIBLE);
             Publication data = publicationList.get(position);
             Uri uri = Uri.parse(data.getMedia().getReddit_video().fallback_url);
             videoContent.setVideoURI(uri);
-            videoContent.start();
+
+//            videoContent.setVideoPath(data.getMedia().getReddit_video().fallback_url);
+//            videoContent.start();
+
+            videoContent.setOnPreparedListener(mediaPlayer -> {
+                progressBar.setVisibility(VideoView.INVISIBLE);
+                videoContent.start();
+            });
+
         }
+
     }
 
     public class ProgressHolder extends ViewHolder {
@@ -216,8 +226,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         ProgressHolder(View itemView) {
             super(itemView);
         }
-
-
 
     }
 }

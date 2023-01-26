@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity
         init();
         fillRecyclerView();
         doRedditApiCall();
+
+        getWindow().setFormat(PixelFormat.TRANSLUCENT);
     }
 
     // start retrofit request
