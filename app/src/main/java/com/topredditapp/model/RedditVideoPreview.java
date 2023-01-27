@@ -3,7 +3,7 @@ package com.topredditapp.model;
 import org.simpleframework.xml.Root;
 
 @Root(strict = false)
-public class RedditVideo {
+public class RedditVideoPreview {
     public int bitrate_kbps;
     public String fallback_url;
     public int height;

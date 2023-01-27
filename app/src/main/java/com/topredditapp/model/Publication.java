@@ -1,9 +1,12 @@
 package com.topredditapp.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Publication implements Serializable {
+    private final String TAG = "Publication";
     private String id;
     private String title;
     private String author;
@@ -15,17 +18,55 @@ public class Publication implements Serializable {
     private String url;
     private Media media;
     private boolean isVideo;
-    private ContentType contentType;
+    private ContentType contentType = ContentType.Default;
     private String iconUrl;
+    private String postHint;
+    private Preview preview;
 
-    public Publication() {}
+    public Publication() {
+    }
 
-    private void defineContentType() {
-        if (isVideo) {
-            this.contentType = ContentType.Video;
-        } else {
-            this.contentType = ContentType.Photo;
+    public void defineContentType() {
+        if (postHint == null && !isVideo) {
+            this.contentType = ContentType.Link;
+            return;
         }
+
+        if (Objects.equals(postHint, "rich:video")) {
+            this.contentType = ContentType.Gif;
+            return;
+        }
+
+        if (isVideo) {
+            Log.d(TAG, "defineContentType: is video " + id);
+            this.contentType = ContentType.Video;
+            return;
+        } else if (Objects.equals(postHint, "image")) {
+            this.contentType = ContentType.Photo;
+            return;
+        } else if (Objects.equals(postHint,"link")) {
+            this.contentType = ContentType.Link;
+            return;
+        }
+
+        this.contentType = ContentType.Link;
+
+    }
+
+    public Preview getPreview() {
+        return preview;
+    }
+
+    public void setPreview(Preview preview) {
+        this.preview = preview;
+    }
+
+    public String getPostHint() {
+        return postHint;
+    }
+
+    public void setPostHint(String postHint) {
+        this.postHint = postHint;
     }
 
     public String getIconUrl() {
@@ -37,7 +78,7 @@ public class Publication implements Serializable {
     }
 
     public int getContentType() {
-        defineContentType();
+//        defineContentType();
         return contentType.getIndexType();
     }
 

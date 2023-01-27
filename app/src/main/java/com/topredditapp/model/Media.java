@@ -7,9 +7,9 @@ import org.simpleframework.xml.Root;
 public class Media {
 
     @Element(name = "reddit_video")
-    private RedditVideo reddit_video;
+    private RedditVideoPreview reddit_video;
 
-    public RedditVideo getReddit_video() {
+    public RedditVideoPreview getReddit_video() {
         return reddit_video;
     }
 }

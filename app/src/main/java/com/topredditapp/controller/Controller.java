@@ -1,7 +1,6 @@
 package com.topredditapp.controller;
 
 
-
 import static com.topredditapp.Const.BASE_URL;
 import static com.topredditapp.Const.PAGE_SIZE;
 
@@ -84,6 +83,9 @@ public class Controller {
                         publication.setMedia(children.get(i).getData().media);
                         publication.setUrl(children.get(i).getData().url);
                         publication.setVideo(children.get(i).getData().is_video);
+                        publication.setPostHint(children.get(i).getData().post_hint);
+                        publication.setPreview(children.get(i).getData().preview);
+                        publication.defineContentType();
                         publications.add(publication);
                         Log.d(TAG, "add publication title: " + publication.getTitle());
                     }
@@ -95,7 +97,7 @@ public class Controller {
                     Log.d(TAG, "Counter pages: " + counterPages +
                             "\n======== end request ==============");
                 } else {
-                    System.out.println(response.errorBody());
+                    System.err.println(response.errorBody());
                 }
             }
 
@@ -113,11 +115,11 @@ public class Controller {
     }
 
     public void clearData() {
-        Log.d("Controller", "clear data");
+        Log.d(TAG, "clear data");
         afterDataId = null;
         publications.clear();
         counterPages = 0;
-        Log.d("Controller", "refresh");
+        Log.d(TAG, "refresh");
     }
 
 }
