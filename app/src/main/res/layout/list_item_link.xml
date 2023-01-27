@@ -56,15 +56,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="16dp"
                     android:background="#269"
                     android:text="Title"
                     android:textSize="18sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/upsText"
-                    app:layout_constraintEnd_toStartOf="@+id/thumbnailImg"
+                    app:layout_constraintEnd_toStartOf="@+id/constraintContentLayout"
                     app:layout_constraintStart_toEndOf="@+id/upsText"
-                    app:layout_constraintTop_toBottomOf="@+id/authorText"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintTop_toBottomOf="@+id/authorText" />
 
                 <TextView
                     android:id="@+id/upsText"
@@ -80,34 +78,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Comments"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/authorText"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintContentLayout" />
+                    app:layout_constraintTop_toBottomOf="@+id/titleText" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintContentLayout"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="8dp"
                     android:background="#344"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/titleText"/>
+                    app:layout_constraintTop_toTopOf="@+id/titleText">
 
-                <ImageView
-                    android:id="@+id/thumbnailImg"
-                    android:layout_width="98dp"
-                    android:layout_height="81dp"
-                    android:layout_marginEnd="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/titleText"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    <ImageView
+                        android:id="@+id/thumbnailImg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:srcCompat="@tools:sample/avatars" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 

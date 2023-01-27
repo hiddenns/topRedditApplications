@@ -1,5 +1,6 @@
 package com.topredditapp.model;
 
+import android.net.Uri;
 import android.util.Log;
 
 import java.io.Serializable;
@@ -38,6 +39,29 @@ public class Publication implements Serializable {
         } else {
             this.contentType = ContentType.Link;
         }
+    }
+
+    public Uri getUriResource() {
+        Uri uri;
+        switch (contentType) {
+            case Photo:
+            case Default:
+                uri = Uri.parse(url);
+                break;
+            case Video:
+                uri = Uri.parse(media.getReddit_video().fallback_url);
+                break;
+            case Gif:
+                uri = Uri.parse(preview.reddit_video_preview.fallback_url);
+                break;
+            case Link:
+                uri = Uri.parse(thumbnail);
+                break;
+            default:
+                throw new IllegalArgumentException("Content type argument exception!");
+        }
+
+        return uri;
     }
 
     public Preview getPreview() {

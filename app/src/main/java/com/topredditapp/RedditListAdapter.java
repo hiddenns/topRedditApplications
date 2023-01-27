@@ -1,8 +1,11 @@
 package com.topredditapp;
 
-import android.media.MediaPlayer;
+import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.topredditapp.model.ContentType;
 import com.topredditapp.model.Publication;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -143,15 +147,12 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         public void onBind(int position) {
             Publication data = publicationList.get(position);
             if (data.getContentType() == VIEW_TYPE_LOADING) {
-                Log.d(TAG,"content type VIEW_TYPE_LOADING");
+                Log.d(TAG, "content type VIEW_TYPE_LOADING");
                 return;
             }
 
             if (data.getId() != null) {
                 Log.d(TAG, "onBind position:" + position + "; data id = " + data.getId());
-                if (data.getId().equals("10lodta")) {
-                    System.out.println();
-                }
                 textComments.setText(data.getNumComments() + " comments");
                 textAuthor.setText(data.getAuthor());
                 textTitle.setText(data.getTitle());
@@ -164,9 +165,40 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
                     textCreatedAt.setText(hoursDiff + " hours ago");
                 }
 
-                constraintLayout.setOnClickListener(view ->
-                        Toast.makeText(view.getContext(), "click on item: "
-                                + data.getTitle(), Toast.LENGTH_LONG).show());
+                constraintLayout.setOnClickListener(view -> {
+                    Uri uri = data.getUriResource();
+                    if (Uri.EMPTY.isAbsolute()) {
+                        view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    }
+                });
+
+                constraintLayout.setOnLongClickListener(view -> {
+                    boolean isSuccess = downloadResource(data, view);
+                    if (isSuccess) {
+                        return isSuccess;
+                    }
+                    Toast.makeText(view.getContext(), "Unavailable downlaod", Toast.LENGTH_LONG).show();
+                    return false;
+                });
+
+            }
+        }
+
+        private boolean downloadResource(Publication data, View view) {
+            if (data == null) {
+                return false;
+            }
+            try {
+                DownloadManager manager = (DownloadManager) view.getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                Uri uri = data.getUriResource();
+                DownloadManager.Request request = new DownloadManager.Request(uri);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, data.getTitle());
+                manager.enqueue(request);
+                return true;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return false;
             }
         }
     }
