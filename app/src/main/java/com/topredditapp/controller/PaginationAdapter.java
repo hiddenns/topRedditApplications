@@ -3,12 +3,9 @@ package com.topredditapp.controller;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,51 +28,114 @@ import com.topredditapp.data.model.Publication;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.ViewHolder> {
-    private List<Publication> publicationList;
-    private boolean isLoaderVisible = false;
-
-    private static final int VIEW_TYPE_LOADING = 0;
+public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.ViewHolder> {
     private static final String TAG = "adapter";
 
-    public RedditListAdapter(List<Publication> publicationList) {
+    private Context context;
+    private List<Publication> publicationList;
+    private static final int VIEW_TYPE_LOADING = 0;
+    private static final int ITEM = 1;
+    private boolean isLoadingAdded = false;
+
+    public PaginationAdapter(Context context) {
+        this.context = context;
+        publicationList = new LinkedList<>();
+    }
+
+    public void setPublicationList(List<Publication> publicationList) {
         this.publicationList = publicationList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
             case 0:
                 Log.d(TAG, "on progressBar holder vt:" + viewType);
                 return new ProgressHolder(
-                        layoutInflater.inflate(R.layout.item_loading_recycler_view, parent, false));
+                        inflater.inflate(R.layout.item_loading_recycler_view, parent, false));
             case 1:
                 Log.d(TAG, "on img holder vt:" + viewType);
-                View viewItemPhoto = layoutInflater.inflate(R.layout.list_item_photo, parent, false);
+                View viewItemPhoto = inflater.inflate(R.layout.list_item_photo, parent, false);
                 return new ViewHolderImg(viewItemPhoto);
             case 2:
             case 4:
                 Log.d(TAG, "on video holder vt:" + viewType);
-                View viewItemVideo = layoutInflater.inflate(R.layout.list_item_video, parent, false);
+                View viewItemVideo = inflater.inflate(R.layout.list_item_video, parent, false);
                 return new ViewHolderVideo(viewItemVideo);
             case 3:
                 Log.d(TAG, "on video link vt:" + viewType);
-                View viewItemLink = layoutInflater.inflate(R.layout.list_item_link, parent, false);
+                View viewItemLink = inflater.inflate(R.layout.list_item_link, parent, false);
                 return new LinkViewHolder(viewItemLink);
             default:
                 Log.d(TAG, "on Default holder vt:" + viewType);
-                View viewItem = layoutInflater.inflate(R.layout.list_item, parent, false);
+                View viewItem = inflater.inflate(R.layout.list_item, parent, false);
                 return new ViewHolder(viewItem);
 
         }
+    }
+
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        add(new Publication());
+    }
+
+    public void removeLoadingFooter() {
+        isLoadingAdded = false;
+
+        int position = publicationList.size() - 1;
+        Publication result = getItem(position);
+
+        if (result != null) {
+            publicationList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    public void removeLoading() {
+        isLoadingAdded = false;
+        int position = publicationList.size() - 1;
+        Publication item = getItem(position);
+        if (item != null) {
+            publicationList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+
+    public void add(Publication movie) {
+        publicationList.add(movie);
+        notifyItemInserted(publicationList.size() - 1);
+    }
+
+    public void addLoading() {
+        isLoadingAdded = true;
+        publicationList.add(new Publication());
+        notifyItemInserted(publicationList.size() - 1);
+    }
+
+    public void addItems(ArrayList<Publication> publications) {
+        publicationList.addAll(publications);
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Publication> publicationResults) {
+        for (Publication result : publicationResults) {
+            add(result);
+        }
+    }
+
+    public Publication getItem(int position) {
+        return publicationList.get(position);
     }
 
     @Override
@@ -91,40 +151,15 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
     @Override
     public int getItemViewType(int position) {
         int itemContentType = publicationList.get(position).getContentType();
-        if (isLoaderVisible) {
+        if (isLoadingAdded) {
             return position == publicationList.size() - 1 ? VIEW_TYPE_LOADING : itemContentType;
         }
         return itemContentType;
     }
 
-    public void addItems(ArrayList<Publication> publications) {
-        publicationList.addAll(publications);
-        notifyDataSetChanged();
-    }
-
-    public void addLoading() {
-        isLoaderVisible = true;
-        publicationList.add(new Publication());
-        notifyItemInserted(publicationList.size() - 1);
-    }
-
-    public void removeLoading() {
-        isLoaderVisible = false;
-        int position = publicationList.size() - 1;
-        Publication item = getItem(position);
-        if (item != null) {
-            publicationList.remove(position);
-            notifyItemRemoved(position);
-        }
-    }
-
     public void clear() {
         publicationList.clear();
         notifyDataSetChanged();
-    }
-
-    Publication getItem(int position) {
-        return publicationList.get(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -171,9 +206,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
 
                 constraintLayout.setOnClickListener(view -> {
                     Uri uri = data.getUriResource();
-                    if (Uri.EMPTY.isAbsolute()) {
-                        view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    }
+                    view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 });
 
                 constraintLayout.setOnLongClickListener(view -> {
@@ -184,7 +217,6 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
                     Toast.makeText(view.getContext(), "Unavailable downlaod", Toast.LENGTH_LONG).show();
                     return false;
                 });
-
             }
         }
 
@@ -291,6 +323,3 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
         }
     }
 }
-
-
-

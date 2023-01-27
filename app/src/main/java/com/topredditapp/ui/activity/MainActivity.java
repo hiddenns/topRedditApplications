@@ -1,174 +1,77 @@
 package com.topredditapp.ui.activity;
 
 
-import static com.topredditapp.utils.Const.BASE_URL;
-import static com.topredditapp.utils.Const.PAGE_SIZE;
-import static com.topredditapp.ui.PaginationListener.PAGE_START;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
-import android.os.PersistableBundle;
-import android.util.Log;
+import android.widget.ProgressBar;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.topredditapp.R;
-import com.topredditapp.controller.RedditListAdapter;
-import com.topredditapp.controller.Controller;
+import com.topredditapp.controller.PaginationAdapter;
 import com.topredditapp.data.model.Child;
 import com.topredditapp.data.model.Publication;
 import com.topredditapp.data.model.Root;
+import com.topredditapp.data.redditapi.ClientAPI;
 import com.topredditapp.data.redditapi.RedditAPI;
 import com.topredditapp.ui.PaginationListener;
+import com.topredditapp.utils.Const;
 
-import org.simpleframework.xml.core.Persist;
-
-import java.io.IOException;
+import java.security.Key;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
-import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "MainActivity";
-    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
+    private PaginationAdapter paginationAdapter;
+    private RedditAPI redditAPI;
+    private ProgressBar progressBar;
+    private static final int PAGE_START = 1;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private int TOTAL_PAGES = 5;
+    private int currentPage = PAGE_START;
 
-    private final Controller redditController = new Controller();
-    private RedditListAdapter rwAdapter;
     private SwipeRefreshLayout swipeRefresh;
     private Parcelable mLayoutManagerState;
-
     private RecyclerView recyclerView;
-    private LinearLayoutManager layoutManager;
 
-    private int currentPage = PAGE_START;
-    private boolean isLastPage = false;
-    private boolean isLoading = false;
-    int itemCount = 0;
+    private String afterDataId = null;
+    private int itemCount = 0;
+
+    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        init();
-        fillRecyclerView();
-        doRedditApiCall();
-        if (savedInstanceState != null) {
-            mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-        }
-    }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-//    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
-         }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(LIST_STATE_KEY, mLayoutManagerState);
-    }
-
-//    @Override
-//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//
-//    }
-
-//    @Override
-//    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-//        super.onPostCreate(savedInstanceState);
-//
-//    }
-
-    // start retrofit request
-    private void doRedditApiCall() {
-        try {
-            redditController.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        new Handler().postDelayed(() -> {
-            ArrayList<Publication> items;
-
-            // If there's a need to upload more data. Already existing data can be truncated
-            if (currentPage != 1 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                items = redditController.getPublications()
-                        .stream()
-                        .skip((long) (currentPage - 1) * PAGE_SIZE)
-                        .collect(Collectors.toCollection(ArrayList::new));
-            } else {
-                items = redditController.getPublications();
-            }
-
-            //manage progress view
-            if (currentPage != PAGE_START) rwAdapter.removeLoading();
-            rwAdapter.addItems(items);
-            swipeRefresh.setRefreshing(false);
-            rwAdapter.addLoading();
-            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-            isLoading = false;
-            rwAdapter.notifyDataSetChanged();
-
-        }, 1500);
-        Log.d(TAG, "doRedditApiCall finish");
-    }
-
-    private void init() {
         recyclerView = findViewById(R.id.recyclerView);
+        progressBar = findViewById(R.id.progressBar);
         swipeRefresh = findViewById(R.id.swipeRefresh);
-    }
 
-    private void fillRecyclerView() {
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        rwAdapter = new RedditListAdapter(new ArrayList<>());
-        //rwAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
-        recyclerView.setAdapter(rwAdapter);
         swipeRefresh.setOnRefreshListener(this);
 
-        // fetch to RedditController recycleViewAdapter for notify them
-        // when data is loaded
-        redditController.setRecyclerView(rwAdapter);
+        redditAPI = ClientAPI.getClient().create(RedditAPI.class);
+        LinearLayoutManager linearLayoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        paginationAdapter = new PaginationAdapter(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(paginationAdapter);
 
-        //add scroll listener while user reach in bottom load more will call
-        recyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
+        recyclerView.addOnScrollListener(new PaginationListener(linearLayoutManager) {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
-                currentPage++;
-                Log.d(TAG, "scroll current page: " + currentPage);
-                doRedditApiCall();
-                //mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+                currentPage += 1;
+                loadNextPage();
             }
 
             @Override
@@ -181,6 +84,81 @@ public class MainActivity extends AppCompatActivity
                 return isLoading;
             }
         });
+
+        loadNextPage();
+
+//        // restore recycler view state
+//        if(savedInstanceState != null)
+//        {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+//            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // save recycler view state
+        outState.putParcelable(LIST_STATE_KEY, recyclerView.getLayoutManager().onSaveInstanceState());
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
+    }
+
+    private void loadNextPage() {
+        ArrayList<Publication> publications = new ArrayList<>();
+        redditAPI.getTopContent(Const.PAGE_SIZE, afterDataId).enqueue(new Callback<Root>() {
+            @Override
+            public void onResponse(@NonNull Call<Root> call, Response<Root> response) {
+                if (currentPage != PAGE_START) paginationAdapter.removeLoading();
+                isLoading = false;
+                ArrayList<Child> children;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    children = response.body().getData().children;
+
+                    for (int i = 0; i < children.size(); i++) {
+                        Publication publication = new Publication();
+                        publication.setId(children.get(i).getData().id);
+                        publication.setCreated(children.get(i).getData().created);
+                        publication.setThumbnail(children.get(i).getData().thumbnail);
+                        publication.setNumComments(children.get(i).getData().num_comments);
+                        publication.setTitle(children.get(i).getData().title);
+                        publication.setUps(children.get(i).getData().ups);
+                        publication.setAuthor(children.get(i).getData().author);
+                        publication.setMedia(children.get(i).getData().media);
+                        publication.setUrl(children.get(i).getData().url);
+                        publication.setVideo(children.get(i).getData().is_video);
+                        publication.setPostHint(children.get(i).getData().post_hint);
+                        publication.setPreview(children.get(i).getData().preview);
+                        publication.defineContentType();
+                        publications.add(publication);
+                    }
+                    afterDataId = response.body().getData().after;
+                    itemCount++;
+                    paginationAdapter.addAll(publications);
+                    paginationAdapter.addLoading();
+                } else {
+                    System.err.println(response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Root> call, Throwable t) {
+                System.err.println(t.getMessage());
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -188,11 +166,160 @@ public class MainActivity extends AppCompatActivity
         itemCount = 0;
         currentPage = PAGE_START;
         isLastPage = false;
-        rwAdapter.clear();
-        redditController.clearData();
-        doRedditApiCall();
-        Log.d(TAG, "refresh");
+        paginationAdapter.clear();
+        swipeRefresh.setRefreshing(false);
+        afterDataId = null;
+        loadNextPage();
     }
+
+
+//    private static final String TAG = "MainActivity";
+//    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
+//
+//    private final Controller redditController = new Controller();
+//    private RedditListAdapter rwAdapter;
+//    private SwipeRefreshLayout swipeRefresh;
+//    private Parcelable mLayoutManagerState;
+//
+//    private RecyclerView recyclerView;
+//    private LinearLayoutManager layoutManager;
+//
+//    private int currentPage = PAGE_START;
+//    private boolean isLastPage = false;
+//    private boolean isLoading = false;
+//    int itemCount = 0;
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//
+//        init();
+//        fillRecyclerView();
+//        doRedditApiCall();
+//        if (savedInstanceState != null) {
+//            mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+//            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
+//        }
+//    }
+//
+////    @Override
+////    protected void onResume() {
+////        super.onResume();
+////        recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
+////    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
+//         }
+//
+//    @Override
+//    public void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putParcelable(LIST_STATE_KEY, mLayoutManagerState);
+//    }
+//
+////    @Override
+////    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+////        super.onRestoreInstanceState(savedInstanceState);
+////
+////    }
+//
+////    @Override
+////    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+////        super.onPostCreate(savedInstanceState);
+////
+////    }
+//
+//    // start retrofit request
+//    private void doRedditApiCall() {
+//        try {
+//            redditController.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        new Handler().postDelayed(() -> {
+//            ArrayList<Publication> items;
+//
+//            // If there's a need to upload more data. Already existing data can be truncated
+//            if (currentPage != 1 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//                items = redditController.getPublications()
+//                        .stream()
+//                        .skip((long) (currentPage - 1) * PAGE_SIZE)
+//                        .collect(Collectors.toCollection(ArrayList::new));
+//            } else {
+//                items = redditController.getPublications();
+//            }
+//
+//            //manage progress view
+//            if (currentPage != PAGE_START) rwAdapter.removeLoading();
+//            rwAdapter.addItems(items);
+//            swipeRefresh.setRefreshing(false);
+//            rwAdapter.addLoading();
+//            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
+//            isLoading = false;
+//            rwAdapter.notifyDataSetChanged();
+//
+//        }, 1500);
+//        Log.d(TAG, "doRedditApiCall finish");
+//    }
+//
+//    private void init() {
+//        recyclerView = findViewById(R.id.recyclerView);
+//        swipeRefresh = findViewById(R.id.swipeRefresh);
+//    }
+//
+//    private void fillRecyclerView() {
+//        recyclerView.setHasFixedSize(true);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        layoutManager = new LinearLayoutManager(this);
+//        recyclerView.setLayoutManager(layoutManager);
+//
+//        rwAdapter = new RedditListAdapter(new ArrayList<>());
+//        //rwAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+//        recyclerView.setAdapter(rwAdapter);
+//        swipeRefresh.setOnRefreshListener(this);
+//
+//        // fetch to RedditController recycleViewAdapter for notify them
+//        // when data is loaded
+//        redditController.setRecyclerView(rwAdapter);
+//
+//        //add scroll listener while user reach in bottom load more will call
+//        recyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
+//            @Override
+//            protected void loadMoreItems() {
+//                isLoading = true;
+//                currentPage++;
+//                Log.d(TAG, "scroll current page: " + currentPage);
+//                doRedditApiCall();
+//                //mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+//            }
+//
+//            @Override
+//            public boolean isLastPage() {
+//                return isLastPage;
+//            }
+//
+//            @Override
+//            public boolean isLoading() {
+//                return isLoading;
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public void onRefresh() {
+//        itemCount = 0;
+//        currentPage = PAGE_START;
+//        isLastPage = false;
+//        rwAdapter.clear();
+//        redditController.clearData();
+//        doRedditApiCall();
+//        Log.d(TAG, "refresh");
+//    }
 
 //    public void start() {
 //        Log.d(TAG, "Start()");
@@ -281,5 +408,5 @@ public class MainActivity extends AppCompatActivity
 //                Log.d(TAG, "Failure request! " + t.getMessage());
 //            }
 //        });
-    }
+}
 
