@@ -246,6 +246,8 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
             Publication data = publicationList.get(position);
             if (!data.getThumbnail().equals("default")) {
                 Picasso.get().load(data.getThumbnail()).into(imageThumbnail);
+            } else {
+                imageThumbnail.setImageResource(R.mipmap.url_icon_foreground);
             }
         }
     }

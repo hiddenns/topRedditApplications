@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.235" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/border.xml" value="0.2645" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2495" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/spinner_right.xml" value="0.147" />
@@ -13,6 +14,8 @@
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_link.xml" value="0.4" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_photo.xml" value="0.1" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_video.xml" value="0.264" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1205" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1975" />
       </map>
     </option>
   </component>
