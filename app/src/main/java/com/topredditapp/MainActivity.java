@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity
         init();
         fillRecyclerView();
         doRedditApiCall();
-
-        getWindow().setFormat(PixelFormat.TRANSLUCENT);
     }
 
     // start retrofit request
@@ -87,7 +85,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void init() {
-        //button = findViewById(R.id.button_test);
         recyclerView = findViewById(R.id.recyclerView);
         swipeRefresh = findViewById(R.id.swipeRefresh);
     }
