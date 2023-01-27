@@ -27,30 +27,17 @@ public class Publication implements Serializable {
     }
 
     public void defineContentType() {
-        if (postHint == null && !isVideo) {
+        if (postHint == null && !isVideo || Objects.equals(postHint, "link")) {
             this.contentType = ContentType.Link;
-            return;
-        }
-
-        if (Objects.equals(postHint, "rich:video")) {
+        } else if (Objects.equals(postHint, "rich:video")) {
             this.contentType = ContentType.Gif;
-            return;
-        }
-
-        if (isVideo) {
-            Log.d(TAG, "defineContentType: is video " + id);
+        } else if (isVideo) {
             this.contentType = ContentType.Video;
-            return;
         } else if (Objects.equals(postHint, "image")) {
             this.contentType = ContentType.Photo;
-            return;
-        } else if (Objects.equals(postHint,"link")) {
+        } else {
             this.contentType = ContentType.Link;
-            return;
         }
-
-        this.contentType = ContentType.Link;
-
     }
 
     public Preview getPreview() {
