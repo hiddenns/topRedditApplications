@@ -1,11 +1,14 @@
-package com.topredditapp;
+package com.topredditapp.controller;
 
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +24,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.topredditapp.model.ContentType;
-import com.topredditapp.model.Publication;
+import com.topredditapp.R;
+import com.topredditapp.data.model.ContentType;
+import com.topredditapp.data.model.Publication;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -34,10 +35,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.http.Url;
 
 public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.ViewHolder> {
-    private final List<Publication> publicationList;
+    private List<Publication> publicationList;
     private boolean isLoaderVisible = false;
 
     private static final int VIEW_TYPE_LOADING = 0;
@@ -255,8 +255,11 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
 
             videoContent.setOnPreparedListener(mediaPlayer -> {
                 progressBar.setVisibility(VideoView.INVISIBLE);
+                float volume = 0.5f; // Volume level, from 0 to 1
+                mediaPlayer.setVolume(volume, volume);
                 videoContent.start();
             });
+
         }
     }
 

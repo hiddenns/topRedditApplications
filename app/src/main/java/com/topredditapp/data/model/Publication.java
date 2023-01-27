@@ -1,7 +1,6 @@
-package com.topredditapp.model;
+package com.topredditapp.data.model;
 
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -20,7 +19,6 @@ public class Publication implements Serializable {
     private Media media;
     private boolean isVideo;
     private ContentType contentType = ContentType.Default;
-    private String iconUrl;
     private String postHint;
     private Preview preview;
 
@@ -80,22 +78,10 @@ public class Publication implements Serializable {
         this.postHint = postHint;
     }
 
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
-    }
-
     public int getContentType() {
-//        defineContentType();
         return contentType.getIndexType();
     }
 
-    public void setContentType(ContentType contentType) {
-        this.contentType = contentType;
-    }
 
     public String getId() {
         return id;
@@ -119,14 +105,6 @@ public class Publication implements Serializable {
 
     public void setUps(int ups) {
         this.ups = ups;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public int getNumComments() {
@@ -191,7 +169,14 @@ public class Publication implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Publication that = (Publication) o;
         if (that.getId() == id) return true;
-        return ups == that.ups && numComments == that.numComments && Double.compare(that.created, created) == 0 && isVideo == that.isVideo && Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(author, that.author) && Objects.equals(description, that.description) && Objects.equals(thumbnail, that.thumbnail) && Objects.equals(url, that.url) && Objects.equals(media, that.media) && contentType == that.contentType && Objects.equals(iconUrl, that.iconUrl);
+        return ups == that.ups && numComments == that.numComments
+                && Double.compare(that.created, created) == 0
+                && isVideo == that.isVideo && Objects.equals(id, that.id)
+                && Objects.equals(title, that.title) && Objects.equals(author, that.author)
+                && Objects.equals(description, that.description)
+                && Objects.equals(thumbnail, that.thumbnail)
+                && Objects.equals(url, that.url) && Objects.equals(media, that.media)
+                && contentType == that.contentType;
     }
 
     @Override

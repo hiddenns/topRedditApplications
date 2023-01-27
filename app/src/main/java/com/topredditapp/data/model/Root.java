@@ -1,4 +1,4 @@
-package com.topredditapp.model;
+package com.topredditapp.data.model;
 
 public class Root{
     private String kind;

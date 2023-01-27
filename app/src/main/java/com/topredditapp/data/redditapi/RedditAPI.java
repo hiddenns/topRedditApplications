@@ -1,6 +1,6 @@
-package com.topredditapp;
+package com.topredditapp.data.redditapi;
 
-import com.topredditapp.model.Root;
+import com.topredditapp.data.model.Root;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

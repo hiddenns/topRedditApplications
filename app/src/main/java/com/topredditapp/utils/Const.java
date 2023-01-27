@@ -1,6 +1,6 @@
-package com.topredditapp;
+package com.topredditapp.utils;
 
 public class Const {
     public static final String BASE_URL = "https://www.reddit.com/";
-    public static final int PAGE_SIZE = 15;
+    public static final int PAGE_SIZE = 10;
 }

@@ -1,4 +1,4 @@
-package com.topredditapp.model;
+package com.topredditapp.data.model;
 
 public enum ContentType {
     Photo(1), Video(2), Link(3), Gif(4), Default(6);

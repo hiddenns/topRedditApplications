@@ -1,6 +1,6 @@
-package com.topredditapp.model;
+package com.topredditapp.data.model;
 
-public class Source{
+public class Resolution{
     public String url;
     public int width;
     public int height;

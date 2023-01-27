@@ -1,22 +1,19 @@
 package com.topredditapp.controller;
 
 
-import static com.topredditapp.Const.BASE_URL;
-import static com.topredditapp.Const.PAGE_SIZE;
+import static com.topredditapp.utils.Const.BASE_URL;
+import static com.topredditapp.utils.Const.PAGE_SIZE;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.topredditapp.MainActivity;
-import com.topredditapp.RedditAPI;
-import com.topredditapp.RedditListAdapter;
-import com.topredditapp.model.Child;
-import com.topredditapp.model.Publication;
-import com.topredditapp.model.Root;
+import com.topredditapp.data.redditapi.RedditAPI;
+import com.topredditapp.data.model.Child;
+import com.topredditapp.data.model.Publication;
+import com.topredditapp.data.model.Root;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,7 +88,7 @@ public class Controller {
                     }
                     Log.d(TAG, "add data ID: " + response.body().getData().after);
                     afterDataId = response.body().getData().after;
-                    recyclerView.notifyDataSetChanged();
+                    //recyclerView.notifyDataSetChanged();
                     counterPages++;
 
                     Log.d(TAG, "Counter pages: " + counterPages +
@@ -109,6 +106,7 @@ public class Controller {
             }
         });
     }
+
 
     public ArrayList<Publication> getPublications() {
         return publications;

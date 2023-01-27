@@ -1,4 +1,4 @@
-package com.topredditapp;
+package com.topredditapp.utils;
 
 import android.content.Context;
 import android.widget.Toast;

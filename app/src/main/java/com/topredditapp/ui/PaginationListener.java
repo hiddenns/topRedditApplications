@@ -1,6 +1,4 @@
-package com.topredditapp;
-
-
+package com.topredditapp.ui;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,7 +9,7 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
     private static final int PAGE_SIZE = 10;
 
     @NonNull
-    private LinearLayoutManager layoutManager;
+    private final LinearLayoutManager layoutManager;
 
     public PaginationListener(@NonNull LinearLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
