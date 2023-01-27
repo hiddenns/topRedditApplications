@@ -24,6 +24,9 @@ import com.squareup.picasso.Picasso;
 import com.topredditapp.model.ContentType;
 import com.topredditapp.model.Publication;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.http.Url;
 
 public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.ViewHolder> {
     private final List<Publication> publicationList;
@@ -193,7 +197,7 @@ public class RedditListAdapter extends RecyclerView.Adapter<RedditListAdapter.Vi
                 Uri uri = data.getUriResource();
                 DownloadManager.Request request = new DownloadManager.Request(uri);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, data.getTitle());
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, String.valueOf(System.currentTimeMillis()));
                 manager.enqueue(request);
                 return true;
             } catch (IllegalArgumentException e) {
