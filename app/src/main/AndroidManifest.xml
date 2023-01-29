@@ -11,7 +11,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TopRedditApp">
+        android:theme="@style/Theme.TopRedditApp"
+        android:configChanges="keyboardHidden|orientation|screenSize">
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true">

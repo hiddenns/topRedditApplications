@@ -28,7 +28,6 @@ import com.topredditapp.data.model.Publication;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,25 +36,27 @@ import butterknife.ButterKnife;
 public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.ViewHolder> {
     private static final String TAG = "adapter";
 
-    private Context context;
-    private List<Publication> publicationList;
+    private ArrayList<Publication> publicationList;
     private static final int VIEW_TYPE_LOADING = 0;
     private static final int ITEM = 1;
     private boolean isLoadingAdded = false;
 
-    public PaginationAdapter(Context context) {
-        this.context = context;
-        publicationList = new LinkedList<>();
+    public PaginationAdapter() {
+        this.publicationList = new ArrayList<>();
     }
 
-    public void setPublicationList(List<Publication> publicationList) {
+    public ArrayList<Publication> getPublicationList() {
+        return publicationList;
+    }
+
+    public void setPublicationList(ArrayList<Publication> publicationList) {
         this.publicationList = publicationList;
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder viewHolder = null;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
@@ -84,23 +85,6 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
         }
     }
 
-    public void addLoadingFooter() {
-        isLoadingAdded = true;
-        add(new Publication());
-    }
-
-    public void removeLoadingFooter() {
-        isLoadingAdded = false;
-
-        int position = publicationList.size() - 1;
-        Publication result = getItem(position);
-
-        if (result != null) {
-            publicationList.remove(position);
-            notifyItemRemoved(position);
-        }
-    }
-
     public void removeLoading() {
         isLoadingAdded = false;
         int position = publicationList.size() - 1;
@@ -110,7 +94,6 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
             notifyItemRemoved(position);
         }
     }
-
 
     public void add(Publication movie) {
         publicationList.add(movie);
@@ -123,15 +106,14 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
         notifyItemInserted(publicationList.size() - 1);
     }
 
-    public void addItems(ArrayList<Publication> publications) {
-        publicationList.addAll(publications);
+    public void addAll(List<Publication> publicationResults) {
+        publicationList.addAll(publicationResults);
         notifyDataSetChanged();
     }
 
-    public void addAll(List<Publication> publicationResults) {
-        for (Publication result : publicationResults) {
-            add(result);
-        }
+    public void clear() {
+        publicationList.clear();
+        notifyDataSetChanged();
     }
 
     public Publication getItem(int position) {
@@ -155,11 +137,6 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
             return position == publicationList.size() - 1 ? VIEW_TYPE_LOADING : itemContentType;
         }
         return itemContentType;
-    }
-
-    public void clear() {
-        publicationList.clear();
-        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -186,7 +163,7 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
         public void onBind(int position) {
             Publication data = publicationList.get(position);
             if (data.getContentType() == VIEW_TYPE_LOADING) {
-                Log.d(TAG, "content type VIEW_TYPE_LOADING");
+                //Log.d(TAG, "content type VIEW_TYPE_LOADING");
                 return;
             }
 
@@ -270,18 +247,10 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
         @Override
         public void onBind(int position) {
             super.onBind(position);
-
             progressBar.setVisibility(View.VISIBLE);
-            Publication data = publicationList.get(position);
-            String urlPublication;
-            if (data.getContentType() == ContentType.Video.getIndexType()) {
-                urlPublication = data.getMedia().getReddit_video().fallback_url;
-            } else if (data.getContentType() == ContentType.Gif.getIndexType()
-                    && data.getPreview().reddit_video_preview != null) {
-                urlPublication = data.getPreview().reddit_video_preview.fallback_url;
-            } else {
-                urlPublication = data.getThumbnail();
-            }
+            Publication videoPublication = publicationList.get(position);
+
+            String urlPublication = defineUrlVideo(videoPublication);
             Uri uri = Uri.parse(urlPublication);
             videoContent.setVideoURI(uri);
 
@@ -293,6 +262,19 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
             });
 
         }
+    }
+
+    private String defineUrlVideo(Publication data) {
+        String urlPublication;
+        if (data.getContentType() == ContentType.Video.getIndexType()) {
+            urlPublication = data.getMedia().getReddit_video().fallback_url;
+        } else if (data.getContentType() == ContentType.Gif.getIndexType()
+                && data.getPreview().reddit_video_preview != null) {
+            urlPublication = data.getPreview().reddit_video_preview.fallback_url;
+        } else {
+            urlPublication = data.getThumbnail();
+        }
+        return urlPublication;
     }
 
     public class ProgressHolder extends ViewHolder {
@@ -315,10 +297,10 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
         public void onBind(int position) {
             super.onBind(position);
             Publication data = publicationList.get(position);
-            if (!data.getThumbnail().equals("default")) {
-                Picasso.get().load(data.getThumbnail()).into(imageThumbnail);
-            } else {
+            if (data.getThumbnail().equals("default") || data.getThumbnail().equals("self")) {
                 imageThumbnail.setImageResource(R.mipmap.url_icon_foreground);
+            } else {
+                Picasso.get().load(data.getThumbnail()).into(imageThumbnail);
             }
         }
     }

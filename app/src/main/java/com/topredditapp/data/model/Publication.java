@@ -7,11 +7,11 @@ import java.util.Objects;
 
 public class Publication implements Serializable {
     private final String TAG = "Publication";
+
     private String id;
     private String title;
     private String author;
     private int ups;
-    private String description;
     private int numComments;
     private double created;
     private String thumbnail;
@@ -26,7 +26,8 @@ public class Publication implements Serializable {
     }
 
     public void defineContentType() {
-        if (postHint == null && !isVideo || Objects.equals(postHint, "link")) {
+
+        if (postHint == null && !isVideo || Objects.equals(postHint, "link") && postHint.equals(null)) {
             this.contentType = ContentType.Link;
         } else if (Objects.equals(postHint, "rich:video")) {
             this.contentType = ContentType.Gif;
@@ -44,6 +45,7 @@ public class Publication implements Serializable {
         switch (contentType) {
             case Photo:
             case Default:
+            case Link:
                 uri = Uri.parse(url);
                 break;
             case Video:
@@ -51,9 +53,6 @@ public class Publication implements Serializable {
                 break;
             case Gif:
                 uri = Uri.parse(preview.reddit_video_preview.fallback_url);
-                break;
-            case Link:
-                uri = Uri.parse(thumbnail);
                 break;
             default:
                 throw new IllegalArgumentException("Content type argument exception!");
@@ -81,7 +80,6 @@ public class Publication implements Serializable {
     public int getContentType() {
         return contentType.getIndexType();
     }
-
 
     public String getId() {
         return id;
@@ -173,7 +171,6 @@ public class Publication implements Serializable {
                 && Double.compare(that.created, created) == 0
                 && isVideo == that.isVideo && Objects.equals(id, that.id)
                 && Objects.equals(title, that.title) && Objects.equals(author, that.author)
-                && Objects.equals(description, that.description)
                 && Objects.equals(thumbnail, that.thumbnail)
                 && Objects.equals(url, that.url) && Objects.equals(media, that.media)
                 && contentType == that.contentType;

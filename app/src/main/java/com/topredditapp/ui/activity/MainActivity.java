@@ -9,6 +9,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.topredditapp.R;
@@ -21,7 +22,6 @@ import com.topredditapp.data.redditapi.RedditAPI;
 import com.topredditapp.ui.PaginationListener;
 import com.topredditapp.utils.Const;
 
-import java.security.Key;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -31,42 +31,34 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener {
 
-    private PaginationAdapter paginationAdapter;
+    private static final String TAG = "mainActivityLog";
+    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
+
+
     private RedditAPI redditAPI;
+    private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private static final int PAGE_START = 1;
+    private PaginationAdapter paginationAdapter = new PaginationAdapter();
+
+    private int itemCount = 0;
+    private String afterDataId = null;
     private boolean isLoading = false;
     private boolean isLastPage = false;
-    private int TOTAL_PAGES = 5;
     private int currentPage = PAGE_START;
+    private static final int PAGE_START = 1;
 
-    private SwipeRefreshLayout swipeRefresh;
     private Parcelable mLayoutManagerState;
-    private RecyclerView recyclerView;
-
-    private String afterDataId = null;
-    private int itemCount = 0;
-
-    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
+    private SwipeRefreshLayout swipeRefresh;
+    private LinearLayoutManager linearLayoutManager;
+    private PaginationListener paginationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = findViewById(R.id.recyclerView);
-        progressBar = findViewById(R.id.progressBar);
-        swipeRefresh = findViewById(R.id.swipeRefresh);
+        init();
 
-        swipeRefresh.setOnRefreshListener(this);
-
-        redditAPI = ClientAPI.getClient().create(RedditAPI.class);
-        LinearLayoutManager linearLayoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        paginationAdapter = new PaginationAdapter(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(paginationAdapter);
-
-        recyclerView.addOnScrollListener(new PaginationListener(linearLayoutManager) {
+        paginationListener = new PaginationListener(linearLayoutManager) {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
@@ -83,30 +75,37 @@ public class MainActivity extends AppCompatActivity
             public boolean isLoading() {
                 return isLoading;
             }
-        });
 
-        loadNextPage();
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
+                }
+            }
+        };
 
-//        // restore recycler view state
-//        if(savedInstanceState != null)
-//        {
-//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-//            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+        recyclerView.addOnScrollListener(paginationListener);
+
+//        if (savedInstanceState != null) {
+//            mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+//            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
 //        }
+        loadNextPage();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // save recycler view state
-        outState.putParcelable(LIST_STATE_KEY, recyclerView.getLayoutManager().onSaveInstanceState());
+    private void init() {
+        recyclerView = findViewById(R.id.recyclerView);
+        progressBar = findViewById(R.id.progressBar);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
+        paginationAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.ALLOW);
+        swipeRefresh.setOnRefreshListener(this);
 
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
+        redditAPI = ClientAPI.getClient().create(RedditAPI.class);
+        linearLayoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(paginationAdapter);
     }
 
     @Override
@@ -115,12 +114,28 @@ public class MainActivity extends AppCompatActivity
         mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
     }
 
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_STATE_KEY, mLayoutManagerState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+        recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
+    }
+
     private void loadNextPage() {
         ArrayList<Publication> publications = new ArrayList<>();
         redditAPI.getTopContent(Const.PAGE_SIZE, afterDataId).enqueue(new Callback<Root>() {
             @Override
             public void onResponse(@NonNull Call<Root> call, Response<Root> response) {
-                if (currentPage != PAGE_START) paginationAdapter.removeLoading();
+                if (currentPage != PAGE_START)
+                    paginationAdapter.removeLoading();
                 isLoading = false;
                 ArrayList<Child> children;
 
@@ -128,26 +143,16 @@ public class MainActivity extends AppCompatActivity
                     children = response.body().getData().children;
 
                     for (int i = 0; i < children.size(); i++) {
-                        Publication publication = new Publication();
-                        publication.setId(children.get(i).getData().id);
-                        publication.setCreated(children.get(i).getData().created);
-                        publication.setThumbnail(children.get(i).getData().thumbnail);
-                        publication.setNumComments(children.get(i).getData().num_comments);
-                        publication.setTitle(children.get(i).getData().title);
-                        publication.setUps(children.get(i).getData().ups);
-                        publication.setAuthor(children.get(i).getData().author);
-                        publication.setMedia(children.get(i).getData().media);
-                        publication.setUrl(children.get(i).getData().url);
-                        publication.setVideo(children.get(i).getData().is_video);
-                        publication.setPostHint(children.get(i).getData().post_hint);
-                        publication.setPreview(children.get(i).getData().preview);
-                        publication.defineContentType();
+                        Publication publication = extractPublication(children, i);
                         publications.add(publication);
                     }
+
                     afterDataId = response.body().getData().after;
                     itemCount++;
                     paginationAdapter.addAll(publications);
                     paginationAdapter.addLoading();
+
+                    recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
                 } else {
                     System.err.println(response.errorBody());
                 }
@@ -172,241 +177,24 @@ public class MainActivity extends AppCompatActivity
         loadNextPage();
     }
 
+    @NonNull
+    private Publication extractPublication(ArrayList<Child> children, int i) {
+        Publication publication = new Publication();
+        publication.setId(children.get(i).getData().id);
+        publication.setCreated(children.get(i).getData().created);
+        publication.setThumbnail(children.get(i).getData().thumbnail);
+        publication.setNumComments(children.get(i).getData().num_comments);
+        publication.setTitle(children.get(i).getData().title);
+        publication.setUps(children.get(i).getData().ups);
+        publication.setAuthor(children.get(i).getData().author);
+        publication.setMedia(children.get(i).getData().media);
+        publication.setUrl(children.get(i).getData().url);
+        publication.setVideo(children.get(i).getData().is_video);
+        publication.setPostHint(children.get(i).getData().post_hint);
+        publication.setPreview(children.get(i).getData().preview);
+        publication.defineContentType();
+        return publication;
+    }
 
-//    private static final String TAG = "MainActivity";
-//    private static final String LIST_STATE_KEY = "LIST_STATE_KEY";
-//
-//    private final Controller redditController = new Controller();
-//    private RedditListAdapter rwAdapter;
-//    private SwipeRefreshLayout swipeRefresh;
-//    private Parcelable mLayoutManagerState;
-//
-//    private RecyclerView recyclerView;
-//    private LinearLayoutManager layoutManager;
-//
-//    private int currentPage = PAGE_START;
-//    private boolean isLastPage = false;
-//    private boolean isLoading = false;
-//    int itemCount = 0;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        init();
-//        fillRecyclerView();
-//        doRedditApiCall();
-//        if (savedInstanceState != null) {
-//            mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-//            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-//        }
-//    }
-//
-////    @Override
-////    protected void onResume() {
-////        super.onResume();
-////        recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-////    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        mLayoutManagerState = recyclerView.getLayoutManager().onSaveInstanceState();
-//         }
-//
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putParcelable(LIST_STATE_KEY, mLayoutManagerState);
-//    }
-//
-////    @Override
-////    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-////        super.onRestoreInstanceState(savedInstanceState);
-////
-////    }
-//
-////    @Override
-////    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-////        super.onPostCreate(savedInstanceState);
-////
-////    }
-//
-//    // start retrofit request
-//    private void doRedditApiCall() {
-//        try {
-//            redditController.start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        new Handler().postDelayed(() -> {
-//            ArrayList<Publication> items;
-//
-//            // If there's a need to upload more data. Already existing data can be truncated
-//            if (currentPage != 1 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                items = redditController.getPublications()
-//                        .stream()
-//                        .skip((long) (currentPage - 1) * PAGE_SIZE)
-//                        .collect(Collectors.toCollection(ArrayList::new));
-//            } else {
-//                items = redditController.getPublications();
-//            }
-//
-//            //manage progress view
-//            if (currentPage != PAGE_START) rwAdapter.removeLoading();
-//            rwAdapter.addItems(items);
-//            swipeRefresh.setRefreshing(false);
-//            rwAdapter.addLoading();
-//            recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-//            isLoading = false;
-//            rwAdapter.notifyDataSetChanged();
-//
-//        }, 1500);
-//        Log.d(TAG, "doRedditApiCall finish");
-//    }
-//
-//    private void init() {
-//        recyclerView = findViewById(R.id.recyclerView);
-//        swipeRefresh = findViewById(R.id.swipeRefresh);
-//    }
-//
-//    private void fillRecyclerView() {
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        layoutManager = new LinearLayoutManager(this);
-//        recyclerView.setLayoutManager(layoutManager);
-//
-//        rwAdapter = new RedditListAdapter(new ArrayList<>());
-//        //rwAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
-//        recyclerView.setAdapter(rwAdapter);
-//        swipeRefresh.setOnRefreshListener(this);
-//
-//        // fetch to RedditController recycleViewAdapter for notify them
-//        // when data is loaded
-//        redditController.setRecyclerView(rwAdapter);
-//
-//        //add scroll listener while user reach in bottom load more will call
-//        recyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
-//            @Override
-//            protected void loadMoreItems() {
-//                isLoading = true;
-//                currentPage++;
-//                Log.d(TAG, "scroll current page: " + currentPage);
-//                doRedditApiCall();
-//                //mLayoutManagerState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-//            }
-//
-//            @Override
-//            public boolean isLastPage() {
-//                return isLastPage;
-//            }
-//
-//            @Override
-//            public boolean isLoading() {
-//                return isLoading;
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onRefresh() {
-//        itemCount = 0;
-//        currentPage = PAGE_START;
-//        isLastPage = false;
-//        rwAdapter.clear();
-//        redditController.clearData();
-//        doRedditApiCall();
-//        Log.d(TAG, "refresh");
-//    }
-
-//    public void start() {
-//        Log.d(TAG, "Start()");
-//        Gson gson = new GsonBuilder()
-//                .setLenient()
-//                .create();
-//
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create(gson))
-//                .build();
-//
-//        RedditAPI redditAPI = retrofit.create(RedditAPI.class);
-//        Call<Root> call;
-//
-//        if (afterDataId == null) {
-//            call = redditAPI.getTopContent(PAGE_SIZE);
-//            Log.d(TAG, "call request DEFAULT");
-//        } else {
-//            Log.d(TAG, "call request AFTER id: " + afterDataId);
-//            call = redditAPI.getTopContent(PAGE_SIZE, afterDataId);
-//        }
-//        Log.d(TAG, "call request done!");
-//
-//        call.enqueue(new Callback<Root>() {
-//            @Override
-//            public void onResponse(@NonNull Call<Root> call, Response<Root> response) {
-//                Log.d(TAG, "onResponse()");
-//
-//                if (response.isSuccessful() && response.body() != null) {
-//                    ArrayList<Child> children = response.body().getData().children;
-//
-//                    for (int i = 0; i < children.size(); i++) {
-//                        Publication publication = new Publication();
-//                        publication.setId(children.get(i).getData().id);
-//                        publication.setCreated(children.get(i).getData().created);
-//                        publication.setThumbnail(children.get(i).getData().thumbnail);
-//                        publication.setNumComments(children.get(i).getData().num_comments);
-//                        publication.setTitle(children.get(i).getData().title);
-//                        publication.setUps(children.get(i).getData().ups);
-//                        publication.setAuthor(children.get(i).getData().author);
-//                        publication.setMedia(children.get(i).getData().media);
-//                        publication.setUrl(children.get(i).getData().url);
-//                        publication.setVideo(children.get(i).getData().is_video);
-//                        publication.setPostHint(children.get(i).getData().post_hint);
-//                        publication.setPreview(children.get(i).getData().preview);
-//                        publication.defineContentType();
-//                        publications.add(publication);
-//                        Log.d(TAG, "add publication title: " + publication.getTitle());
-//                    }
-//
-//                    ArrayList<Publication> items = new ArrayList<>();
-//                    // If there's a need to upload more data. Already existing data can be truncated
-//                    if (currentPage != 1 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                        items = publications
-//                                .stream()
-//                                .skip((long) (currentPage - 1) * PAGE_SIZE)
-//                                .collect(Collectors.toCollection(ArrayList::new));
-//                    } else {
-//                        items = publications;
-//                    }
-//
-//                    publications = items;
-//                    Log.d(TAG, "add data ID: " + response.body().getData().after);
-//                    if (currentPage != PAGE_START) rwAdapter.removeLoading();
-//                    rwAdapter.addItems(publications);
-//                    rwAdapter.notifyDataSetChanged();
-//                    swipeRefresh.setRefreshing(false);
-//                    rwAdapter.addLoading();
-//                    recyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
-//                    isLoading = false;
-//                    afterDataId = response.body().getData().after;
-//                    counterPages++;
-//
-//                    Log.d(TAG, "Counter pages: " + counterPages +
-//                            "\n======== end request ==============");
-//                } else {
-//                    System.err.println(response.errorBody());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Root> call, Throwable t) {
-//                System.err.println(t.getMessage());
-//                t.printStackTrace();
-//                Log.d(TAG, "Failure request! " + t.getMessage());
-//            }
-//        });
 }
 
