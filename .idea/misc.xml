@@ -5,17 +5,23 @@
       <map>
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.235" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/border.xml" value="0.2645" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/custom_progressbar.xml" value="0.2595" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/gradient_background.xml" value="0.1" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2495" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/shadow_header_text.xml" value="0.1705" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/spinner_right.xml" value="0.147" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/text_title_background.xml" value="0.1" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/drawable/url_icon_background.xml" value="0.1975" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout-land/activity_mail.xml" value="0.1" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout-land/activity_main.xml" value="0.17019400352733685" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/item_loading.xml" value="0.1" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/item_loading_recycler_view.xml" value="0.2129115006412997" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/item_loading_video_view.xml" value="0.1" />
-        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item.xml" value="0.39541160593792174" />
-        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_link.xml" value="0.3121951219512195" />
-        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_photo.xml" value="0.1" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item.xml" value="0.21674876847290642" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_first_text.xml" value="0.455078125" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_link.xml" value="0.25092250922509224" />
+        <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_photo.xml" value="0.176" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/layout/list_item_video.xml" value="0.264" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1205" />
         <entry key="..\:/Users/eigon/AndroidStudioProjects/TopRedditApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1975" />

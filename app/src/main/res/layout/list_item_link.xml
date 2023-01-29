@@ -6,14 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:layout_marginTop="28dp"
-        app:cardBackgroundColor="#499DD8"
+        app:cardBackgroundColor="@color/background_view_holder"
         app:cardCornerRadius="8dp"
+        app:strokeColor="@color/grey_border"
+        app:strokeWidth="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,7 +37,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="author"
+                    android:text="@string/default_text_author"
+                    android:fontFamily="@font/comfortaa_light"
+                    android:textColor="@color/white"
                     app:autoSizeMaxTextSize="24sp"
                     app:autoSizeMinTextSize="16sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +50,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="X hours ago"
+                    android:text="@string/default_text_created"
+                    android:fontFamily="@font/comfortaa_light"
+                    android:textColor="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/authorText" />
 
@@ -56,20 +62,28 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="#269"
-                    android:text="Title"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/text_title_background"
+                    android:padding="10dp"
+                    android:text="@string/default_text_title"
+                    android:fontFamily="@font/comfortaa_light"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/upsText"
                     app:layout_constraintEnd_toStartOf="@+id/constraintContentLayout"
                     app:layout_constraintStart_toEndOf="@+id/upsText"
-                    app:layout_constraintTop_toBottomOf="@+id/authorText" />
+                    app:layout_constraintTop_toBottomOf="@+id/authorText"
+                    app:layout_constraintVertical_bias="0.0" />
 
                 <TextView
                     android:id="@+id/upsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Ups"
+                    android:text="@string/default_text_ups"
+                    android:fontFamily="@font/comfortaa_light"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
                     app:layout_constraintStart_toStartOf="@+id/authorText"
                     app:layout_constraintTop_toBottomOf="@+id/authorText" />
 
@@ -79,15 +93,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Comments"
+                    android:text="@string/default_text_comments"
+                    android:fontFamily="@font/comfortaa_light"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/authorText"
                     app:layout_constraintTop_toBottomOf="@+id/titleText" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintContentLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="82dp"
+                    android:layout_height="78dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="8dp"
                     android:background="#344"
@@ -101,7 +117,6 @@
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:srcCompat="@tools:sample/avatars" />
@@ -110,6 +125,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

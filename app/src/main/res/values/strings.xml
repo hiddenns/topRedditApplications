@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">TopRedditApp</string>
+    <string name="text_header_view_holder">Reddit popular posts</string>
+    <string name="default_text_title">Title</string>
+    <string name="default_text_comments">Comments</string>
+    <string name="default_text_ups">Ups</string>
+    <string name="default_text_author">author</string>
+    <string name="default_text_created">Date created</string>
 </resources>

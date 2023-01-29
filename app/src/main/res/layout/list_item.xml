@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintParentLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -12,7 +12,8 @@
         android:layout_height="100dp"
         android:layout_margin="10dp"
         android:layout_marginTop="28dp"
-        app:cardBackgroundColor="#71ACE1"
+        app:cardBackgroundColor="@color/background_view_holder"
+
         app:cardCornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 import com.topredditapp.R;
 import com.topredditapp.data.model.ContentType;
 import com.topredditapp.data.model.Publication;
+import com.topredditapp.ui.PaginationListener;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +36,7 @@ import butterknife.ButterKnife;
 
 public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.ViewHolder> {
     private static final String TAG = "adapter";
+    private static final int VIEW_TYPE_HEADER = 11;
 
     private ArrayList<Publication> publicationList;
     private static final int VIEW_TYPE_LOADING = 0;
@@ -77,10 +79,14 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
                 Log.d(TAG, "on video link vt:" + viewType);
                 View viewItemLink = inflater.inflate(R.layout.list_item_link, parent, false);
                 return new LinkViewHolder(viewItemLink);
+            case 11:
+
+                return new FirstViewHolderText(inflater.inflate(R.layout.list_item_first_text, parent, false));
             default:
-                Log.d(TAG, "on Default holder vt:" + viewType);
-                View viewItem = inflater.inflate(R.layout.list_item, parent, false);
-                return new ViewHolder(viewItem);
+                throw new IllegalArgumentException("Pagination Adapter: viewType is undefined");
+//                Log.d(TAG, "on Default holder vt:" + viewType);
+//                View viewItem = inflater.inflate(R.layout.list_item, parent, false);
+//                return new ViewHolder(viewItem);
 
         }
     }
@@ -121,7 +127,7 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PaginationAdapter.ViewHolder holder, int position) {
         holder.onBind(position);
     }
 
@@ -132,6 +138,10 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
 
     @Override
     public int getItemViewType(int position) {
+        if (position == 0) {
+            return VIEW_TYPE_HEADER;
+        }
+
         int itemContentType = publicationList.get(position).getContentType();
         if (isLoadingAdded) {
             return position == publicationList.size() - 1 ? VIEW_TYPE_LOADING : itemContentType;
@@ -162,10 +172,6 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
 
         public void onBind(int position) {
             Publication data = publicationList.get(position);
-            if (data.getContentType() == VIEW_TYPE_LOADING) {
-                //Log.d(TAG, "content type VIEW_TYPE_LOADING");
-                return;
-            }
 
             if (data.getId() != null) {
                 Log.d(TAG, "onBind position:" + position + "; data id = " + data.getId());
@@ -280,7 +286,11 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
     public class ProgressHolder extends ViewHolder {
         ProgressHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void onBind(int position) {
+            //super.onBind(position);
         }
     }
 
@@ -302,6 +312,22 @@ public class PaginationAdapter extends RecyclerView.Adapter<PaginationAdapter.Vi
             } else {
                 Picasso.get().load(data.getThumbnail()).into(imageThumbnail);
             }
+        }
+    }
+
+    public class FirstViewHolderText extends PaginationAdapter.ViewHolder {
+
+        @BindView(R.id.text_top_header)
+        TextView textHeader;
+
+        public FirstViewHolderText(@NonNull View itemView) {
+            super(itemView);
+            textHeader = itemView.findViewById(R.id.text_top_header);
+        }
+
+        @Override
+        public void onBind(int position) {
+            //super.onBind(position);
         }
     }
 }

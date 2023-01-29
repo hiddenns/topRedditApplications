@@ -8,5 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-<!--    <color name="dark_blue">#04131f</color>-->
+    <color name="dark_blue_background">#04131f</color>
+    <color name="blue_background">#193741</color>
+    <color name="grey_border">#243d47</color>
+    <color name="blue_active_btn">#243d47</color>
+    <color name="background_view_holder">#102531</color>
+    <color name="background_title_text">#07161f</color>
 </resources>
